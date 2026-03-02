@@ -1,0 +1,30 @@
+@import "tailwindcss";
+
+@theme {
+  --font-mono: "JetBrains Mono", "Courier New", monospace;
+}
+
+body {
+  @apply bg-zinc-50 text-zinc-900 font-mono antialiased;
+}
+
+.ascii-box {
+  @apply border-2 border-zinc-800 p-4 bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)];
+}
+
+.btn-pixel {
+  @apply border-2 border-zinc-800 px-4 py-2 bg-white hover:bg-zinc-100 active:translate-y-0.5 active:shadow-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+.progress-bar-inner {
+  @apply h-full bg-zinc-800 transition-all duration-500 ease-out;
+}
+
+@keyframes slideIn {
+  from { transform: translateY(10px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.animate-slide {
+  animation: slideIn 0.3s ease-out forwards;
+}

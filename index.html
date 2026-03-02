@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bengkel Manager SMART - Dashboard</title>
+    <style>
+        :root {
+            --bg-dark: #02050a;
+            --bg-accent: #0a192f;
+            --neon-cyan: #00ffff;
+            --neon-blue: #0072ff;
+            --glow-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+            --glass: rgba(255, 255, 255, 0.05);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+
+        body {
+            background: linear-gradient(-45deg, var(--bg-dark), var(--bg-accent), #000b18, var(--bg-dark));
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: white;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        body::before {
+            content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: linear-gradient(to right, rgba(0, 255, 255, 0.03) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(0, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px; pointer-events: none; z-index: 0;
+        }
+
+        #loader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-dark); display: flex; flex-direction: column;
+            align-items: center; justify-content: center; z-index: 100;
+            transition: opacity 0.8s ease;
+        }
+
+        .loader-bar {
+            width: 250px; height: 4px; background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px; overflow: hidden; margin-top: 20px;
+        }
+
+        .loader-progress {
+            width: 0%; height: 100%; background: var(--neon-cyan);
+            box-shadow: 0 0 20px var(--neon-cyan);
+            animation: load 2.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes load { 0% { width: 0%; } 100% { width: 100%; } }
+
+        #main-content, #game-content, #result-screen, #form-screen, #instructions-screen {
+            opacity: 0; transform: translateY(20px); transition: all 0.8s ease;
+            z-index: 1; width: 100%; max-width: 800px; text-align: center; padding: 20px;
+            display: none;
+        }
+
+        .visible { opacity: 1 !important; transform: translateY(0) !important; display: block !important; }
+
+        /* Futuristic Building Design */
+        .building-container {
+            position: relative;
+            width: 200px;
+            height: 150px;
+            margin: 0 auto 30px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .building-part {
+            background: rgba(0, 255, 255, 0.1);
+            border: 1px solid var(--neon-cyan);
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+            position: relative;
+        }
+
+        .tower { width: 60px; height: 120px; }
+        .wing { width: 40px; height: 60px; }
+        .roof {
+            position: absolute;
+            top: -20px;
+            left: -1px;
+            width: calc(100% + 2px);
+            height: 20px;
+            background: var(--neon-cyan);
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+            box-shadow: 0 0 15px var(--neon-cyan);
+        }
+
+        .window {
+            width: 10px;
+            height: 10px;
+            background: var(--neon-cyan);
+            margin: 10px auto;
+            box-shadow: 0 0 5px var(--neon-cyan);
+            animation: windowPulse 2s infinite alternate;
+        }
+
+        @keyframes windowPulse {
+            from { opacity: 0.3; }
+            to { opacity: 1; }
+        }
+
+        .workshop-sign {
+            position: absolute;
+            bottom: 20px;
+            width: 120%;
+            left: -10%;
+            background: var(--bg-dark);
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            font-size: 0.6rem;
+            font-weight: bold;
+            padding: 2px;
+            text-transform: uppercase;
+            box-shadow: 0 0 10px var(--neon-cyan);
+        }
+
+        h1 {
+            font-size: clamp(1.5rem, 6vw, 3.5rem); font-weight: 800; letter-spacing: 8px;
+            text-transform: uppercase; text-shadow: 0 0 15px var(--neon-cyan); margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 0.9rem; color: var(--neon-cyan); letter-spacing: 3px;
+            text-transform: uppercase; margin-bottom: 40px; opacity: 0.8;
+        }
+
+        .card {
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 255, 255, 0.2); padding: 25px;
+            border-radius: 5px; margin-bottom: 20px;
+        }
+
+        .btn-group { display: flex; flex-direction: column; gap: 12px; align-items: center; }
+
+        .btn {
+            width: 300px; padding: 14px; background: transparent;
+            border: 1px solid var(--neon-cyan); color: white;
+            text-transform: uppercase; letter-spacing: 2px; font-weight: bold;
+            cursor: pointer; transition: all 0.3s ease; border-radius: 2px;
+        }
+
+        .btn:hover:not(:disabled) {
+            background: var(--neon-cyan); color: var(--bg-dark);
+            box-shadow: 0 0 20px var(--neon-cyan);
+        }
+
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .marquee-container {
+            position: fixed; bottom: 50px; width: 100%; overflow: hidden;
+            background: rgba(0, 0, 0, 0.4); padding: 8px 0;
+            border-top: 1px solid rgba(0, 255, 255, 0.1);
+        }
+
+        .marquee-text {
+            display: inline-block; white-space: nowrap; color: var(--neon-cyan);
+            font-size: 0.8rem; letter-spacing: 1px; animation: marquee 25s linear infinite;
+        }
+
+        @keyframes marquee { from { transform: translateX(100%); } to { transform: translateX(-100%); } }
+
+        footer {
+            position: fixed; bottom: 15px; font-size: 0.7rem;
+            color: rgba(0, 255, 255, 0.4); letter-spacing: 1px;
+        }
+
+        input {
+            width: 100%; padding: 12px; background: rgba(255,255,255,0.1);
+            border: 1px solid var(--neon-cyan); color: white; margin-bottom: 10px;
+        }
+
+        .feedback-msg { margin-top: 15px; font-weight: bold; min-height: 24px; }
+
+        /* Level Path Styling */
+        .level-path {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+            background: rgba(0, 255, 255, 0.03);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+        }
+        .path-node {
+            font-size: 0.6rem;
+            padding: 6px 10px;
+            border: 1px solid rgba(0, 255, 255, 0.4);
+            color: rgba(0, 255, 255, 0.7);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background: rgba(0, 255, 255, 0.05);
+            white-space: nowrap;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+        .path-node.active {
+            border-color: var(--neon-cyan);
+            color: var(--neon-cyan);
+            background: rgba(0, 255, 255, 0.15);
+            box-shadow: 0 0 8px rgba(0, 255, 255, 0.3);
+        }
+        .path-node.final {
+            border-color: var(--neon-blue);
+            color: white;
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-cyan));
+            font-weight: bold;
+            box-shadow: 0 0 15px var(--neon-blue);
+        }
+        .path-line {
+            width: 12px;
+            height: 1px;
+            background: rgba(0, 255, 255, 0.3);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="loader">
+        <div style="color: var(--neon-cyan); letter-spacing: 3px; font-size: 0.7rem;">SYSTEM INITIALIZING...</div>
+        <div class="loader-bar"><div class="loader-progress"></div></div>
+    </div>
+
+    <div id="main-content">
+        <div class="building-container">
+            <div class="building-part wing"></div>
+            <div class="building-part tower">
+                <div class="roof"></div>
+                <div class="window"></div>
+                <div class="window" style="animation-delay: 0.5s;"></div>
+                <div class="workshop-sign">SMART WORKSHOP</div>
+            </div>
+            <div class="building-part wing"></div>
+        </div>
+        <h1>Bengkel Manager SMART</h1>
+        <div class="subtitle">Fase F - Elemen Proses Pelayanan dan Manajemen Bengkel Kendaraan Ringan</div>
+        
+        <div class="level-path" id="level-path-display">
+            <div class="path-node">Penerimaan</div>
+            <div class="path-line"></div>
+            <div class="path-node">Identifikasi</div>
+            <div class="path-line"></div>
+            <div class="path-node">Antrian</div>
+            <div class="path-line"></div>
+            <div class="path-node">Estimasi</div>
+            <div class="path-line"></div>
+            <div class="path-node">QC</div>
+            <div class="path-line"></div>
+            <div class="path-node">Kepuasan</div>
+            <div class="path-line"></div>
+            <div class="path-node final">Uji Kompetensi</div>
+        </div>
+
+        <div class="btn-group">
+            <button class="btn" onclick="startGame()">▶ Mulai Game</button>
+            <button class="btn" onclick="showInstructions()">📘 Petunjuk</button>
+        </div>
+    </div>
+
+    <div id="instructions-screen">
+        <div class="card">
+            <h2 style="color: var(--neon-cyan); margin-bottom: 20px;">PETUNJUK PERMAINAN</h2>
+            <p style="line-height: 1.8; text-align: left; margin-bottom: 25px; font-size: 0.95rem;">
+                1. Kerjakan setiap level dengan cermat dan teliti.<br>
+                2. Semua jawaban harus benar untuk mendapatkan hasil maksimal.<br>
+                3. Anda harus mencapai nilai minimal 75 untuk dapat melanjutkan ke level berikutnya.
+            </p>
+            <button class="btn" onclick="showHome()" style="width: 100%;">Kembali ke Beranda</button>
+        </div>
+    </div>
+
+    <div id="game-content">
+        <div class="card" style="text-align: left;">
+            <div id="level-info" style="color: var(--neon-cyan); font-size: 0.7rem; text-transform: uppercase; margin-bottom: 10px;">LEVEL 01</div>
+            <div id="question-text" style="font-size: 1.1rem; font-weight: bold;">Memuat soal...</div>
+        </div>
+        <div id="options-group" class="btn-group"></div>
+        <div id="feedback" class="feedback-msg"></div>
+        <button id="next-btn" class="btn" style="display: none; margin-top: 20px; width: 100%;">Lanjut</button>
+    </div>
+
+    <div id="result-screen">
+        <div class="card">
+            <h2 id="result-title" style="margin-bottom: 15px;">Level Selesai</h2>
+            <div id="result-score" style="font-size: 3rem; font-weight: 800; color: var(--neon-cyan);">0</div>
+            <p id="result-msg" style="margin-top: 10px;"></p>
+        </div>
+        <div class="btn-group">
+            <button id="result-action-btn" class="btn">Lanjut</button>
+            <button class="btn" onclick="location.reload()" style="border-color: rgba(255,255,255,0.3);">Menu Utama</button>
+        </div>
+    </div>
+
+    <div id="form-screen">
+        <div class="card">
+            <h2 style="margin-bottom: 20px;">Data Peserta</h2>
+            <input type="text" id="user-name" placeholder="Nama Lengkap">
+            <input type="text" id="user-class" placeholder="Kelas">
+            <input type="text" id="user-school" placeholder="Asal Sekolah">
+            <button class="btn" onclick="submitFinal()" style="width: 100%; margin-top: 10px;">Selesaikan</button>
+        </div>
+    </div>
+
+    <div class="marquee-container">
+        <div class="marquee-text">
+            Latih Manajemen Bengkel Anda dan Bangun Reputasi Profesional — SMK Teknik Kendaraan Ringan — Kalimmustofa Automotive Education —
+        </div>
+    </div>
+
+    <footer>Copyrigt : Kalimmustofa automotive Education</footer>
+
+    <script>
+        const gameData = [
+            { title: "Penerimaan", q: [
+                {q:"Apa langkah pertama saat pelanggan datang?", a:["Sapa ramah","Cek mesin","Minta DP","Suruh tunggu"], c:0},
+                {q:"Dokumen wajib saat pendaftaran?", a:["Kwitansi","Work Order","Brosur","Kartu Nama"], c:1},
+                {q:"Apa itu 3S?", a:["Sabar, Santai, Selesai","Senyum, Sapa, Salam","Service, Sparepart, Sales","Semua Senang"], c:1},
+                {q:"Data paling penting dicatat?", a:["Warna mobil","Keluhan","Nama hewan","Merk ban"], c:1},
+                {q:"Kapan estimasi biaya diberikan?", a:["Setelah selesai","Sebelum kerja","Saat bayar","Tidak perlu"], c:1}
+            ]},
+            { title: "Identifikasi", q: [
+                {q:"Bunyi mendecit saat rem biasanya?", a:["Ban bocor","Kampas rem tipis","Oli habis","Kaca kotor"], c:1},
+                {q:"Asap putih pekat dari knalpot?", a:["Bensin irit","Oli ikut terbakar","Air radiator penuh","Ban panas"], c:1},
+                {q:"Mesin pincang saat idle?", a:["Busi mati","Knalpot bocor","Lampu mati","Rem blong"], c:0},
+                {q:"Setir bergetar saat kecepatan tinggi?", a:["Oli kotor","Balancing roda","Kaca retak","Lampu redup"], c:1},
+                {q:"Lampu indikator aki menyala?", a:["Aki penuh","Pengisian bermasalah","Lampu jauh aktif","Bensin habis"], c:1}
+            ]},
+            { title: "Antrian", q: [
+                {q:"Mobil Ganti Oli vs Turun Mesin, mana didahulukan di Fast Track?", a:["Turun Mesin","Ganti Oli","Dua-duanya","Tunggu besok"], c:1},
+                {q:"Fungsi papan kontrol antrian?", a:["Hiasan","Monitor progres","Cermin","Tempat kunci"], c:1},
+                {q:"Pelanggan booking servis harus?", a:["Antri ulang","Diprioritaskan","Disuruh pulang","Bayar mahal"], c:1},
+                {q:"Stall adalah?", a:["Tempat makan","Area kerja teknisi","Gudang ban","Ruang tunggu"], c:1},
+                {q:"Lead time adalah?", a:["Waktu istirahat","Waktu proses servis","Waktu makan","Waktu tidur"], c:1}
+            ]},
+            { title: "Estimasi", q: [
+                {q:"Jasa 100rb, Oli 300rb, Filter 50rb. Total?", a:["400rb","450rb","500rb","350rb"], c:1},
+                {q:"Jika ada tambahan sparepart, SA harus?", a:["Langsung ganti","Konfirmasi pelanggan","Diam saja","Minta teknisi bayar"], c:1},
+                {q:"PPN 11% dari 1jt?", a:["11rb","110rb","1.1jt","100rb"], c:1},
+                {q:"Diskon 10% dari 500rb?", a:["5rb","50rb","10rb","100rb"], c:1},
+                {q:"Estimasi waktu meleset, SA harus?", a:["Sembunyi","Hubungi pelanggan","Marahi teknisi","Matikan HP"], c:1}
+            ]},
+            { title: "Quality Control", q: [
+                {q:"Siapa yang melakukan QC?", a:["Pelanggan","Foreman","Satpam","Cleaning service"], c:1},
+                {q:"QC dilakukan kapan?", a:["Sebelum kerja","Setelah kerja selesai","Saat pendaftaran","Besoknya"], c:1},
+                {q:"Fungsi Test Drive?", a:["Jalan-jalan","Pastikan keluhan hilang","Beli bensin","Cari makan"], c:1},
+                {q:"Part bekas harus?", a:["Dibuang","Dikembalikan ke pelanggan","Dijual","Disimpan teknisi"], c:1},
+                {q:"Mobil kotor setelah servis?", a:["Biar saja","Dibersihkan ulang","Minta pelanggan cuci","Beri diskon"], c:1}
+            ]},
+            { title: "Kepuasan", q: [
+                {q:"Pelanggan komplain, SA harus?", a:["Debat","Dengar & Solusi","Cuek","Marah"], c:1},
+                {q:"Follow up dilakukan?", a:["1 jam","2-3 hari setelah servis","1 tahun","Tidak perlu"], c:1},
+                {q:"Ruang tunggu nyaman meningkatkan?", a:["Harga","Kepuasan","Kecepatan teknisi","Panas mesin"], c:1},
+                {q:"Serah terima kendaraan harus?", a:["Lempar kunci","Jelaskan hasil kerja","Langsung pergi","Minta tips"], c:1},
+                {q:"Service Reminder berfungsi?", a:["Ganggu pelanggan","Ingatkan jadwal servis","Promosi makanan","Cari jodoh"], c:1}
+            ]},
+            { title: "Uji Kompetensi", q: [
+                {q:"SOP singkatan dari?", a:["Standard Operating Procedure","Sistem Operasi Pusat","Sarana Otomotif Prima","Semua Orang Pintar"], c:0},
+                {q:"Alat pelindung bodi mobil?", a:["Fender cover","Jas hujan","Payung","Plastik sampah"], c:0},
+                {q:"Alat angkat kendaraan?", a:["Dongkrak/Car lift","Tang","Obeng","Palu"], c:0},
+                {q:"SA singkatan dari?", a:["Service Advisor","Sistem Ahli","Sales Agent","Super Admin"], c:0},
+                {q:"Dokumen perintah kerja?", a:["Work Order","Kwitansi","Invoice","Katalog"], c:0},
+                {q:"Warna oli mesin baru?", a:["Hitam","Bening/Kuning","Merah","Hijau"], c:1},
+                {q:"Tekanan ban standar mobil penumpang?", a:["10-20 psi","30-35 psi","60-80 psi","100 psi"], c:1},
+                {q:"Alat ukur ketebalan kampas rem?", a:["Mistar","Jangka sorong","Termometer","Timbangan"], c:1},
+                {q:"Cairan pendingin mesin?", a:["Oli","Coolant","Minyak rem","Air sabun"], c:1},
+                {q:"Fungsi filter udara?", a:["Saring debu ke mesin","Saring bensin","Saring oli","Hiasan"], c:0},
+                {q:"Aki 12V, tegangan normal saat mesin hidup?", a:["10V","13.8-14.5V","5V","24V"], c:1},
+                {q:"Sistem rem menggunakan prinsip?", a:["Pascal","Archimedes","Newton","Gravitasi"], c:0},
+                {q:"Komponen pengapian?", a:["Busi","Ban","Kaca","Pintu"], c:0},
+                {q:"Ganti oli mesin biasanya setiap?", a:["100 km","5.000-10.000 km","1 juta km","Tiap hari"], c:1},
+                {q:"Sikap profesional SA?", a:["Jujur & Disiplin","Malas","Berbohong","Kasar"], c:0}
+            ]}
+        ];
+
+        let curLvl = 0, curQ = 0, score = 0, lvlScore = 0;
+
+        function showInstructions() {
+            document.getElementById('main-content').classList.remove('visible');
+            setTimeout(() => {
+                document.getElementById('instructions-screen').classList.add('visible');
+            }, 500);
+        }
+
+        function showHome() {
+            document.querySelectorAll('#main-content, #game-content, #result-screen, #form-screen, #instructions-screen').forEach(s => s.classList.remove('visible'));
+            updatePath();
+            setTimeout(() => {
+                document.getElementById('main-content').classList.add('visible');
+            }, 500);
+        }
+
+        function updatePath() {
+            const nodes = document.querySelectorAll('.path-node');
+            nodes.forEach((node, idx) => {
+                if (idx <= curLvl) {
+                    node.classList.add('active');
+                } else {
+                    node.classList.remove('active');
+                }
+            });
+        }
+
+        function startGame() {
+            document.getElementById('main-content').classList.remove('visible');
+            document.getElementById('instructions-screen').classList.remove('visible');
+            setTimeout(() => {
+                document.getElementById('game-content').classList.add('visible');
+                loadQ();
+            }, 500);
+        }
+
+        function loadQ() {
+            const data = gameData[curLvl].q[curQ];
+            const isFinal = curLvl === 6;
+            document.getElementById('level-info').innerText = `${gameData[curLvl].title} | SOAL ${curQ + 1}/${isFinal ? 15 : 5}`;
+            document.getElementById('question-text').innerText = data.q;
+            document.getElementById('feedback').innerText = '';
+            document.getElementById('next-btn').style.display = 'none';
+            const optGrp = document.getElementById('options-group');
+            optGrp.innerHTML = '';
+            data.a.forEach((opt, i) => {
+                const b = document.createElement('button');
+                b.className = 'btn';
+                b.innerText = opt;
+                b.onclick = () => checkA(i);
+                optGrp.appendChild(b);
+            });
+        }
+
+        function checkA(idx) {
+            const data = gameData[curLvl].q[curQ];
+            document.querySelectorAll('#options-group .btn').forEach(b => b.disabled = true);
+            if(idx === data.c) {
+                lvlScore += (curLvl === 6 ? (100/15) : 20);
+                document.getElementById('feedback').innerText = 'DITERIMA';
+            } else {
+                document.getElementById('feedback').innerText = 'DITOLAK';
+            }
+            document.getElementById('next-btn').style.display = 'block';
+        }
+
+        document.getElementById('next-btn').onclick = () => {
+            curQ++;
+            const maxQ = curLvl === 6 ? 15 : 5;
+            if(curQ < maxQ) loadQ();
+            else showResult();
+        };
+
+        function showResult() {
+            document.getElementById('game-content').classList.remove('visible');
+            const finalScore = Math.round(lvlScore);
+            setTimeout(() => {
+                document.getElementById('result-screen').classList.add('visible');
+                document.getElementById('result-score').innerText = finalScore;
+                const btn = document.getElementById('result-action-btn');
+                
+                if(finalScore >= 75) {
+                    let msg = "";
+                    if (curLvl === 5) {
+                        msg = "LUAR BIASA! Anda telah melewati seluruh tahap simulasi harian dengan gemilang. Kini saatnya membuktikan kompetensi Anda di tahap akhir: UJI KOMPETENSI. Tunjukkan bahwa Anda adalah Service Advisor terbaik!";
+                    } else {
+                        const passMsgs = [
+                            "Luar biasa! Pemahaman Anda sangat tajam. Tantangan berikutnya menanti, apakah Anda siap membuktikan keahlian Anda lagi?",
+                            "Kerja bagus! Anda menunjukkan potensi Service Advisor profesional. Siapkan diri untuk skenario yang lebih kompleks!",
+                            "Hebat! Standar pelayanan Anda sudah di atas rata-rata. Terus pertahankan performa ini di level selanjutnya!"
+                        ];
+                        msg = passMsgs[Math.floor(Math.random() * passMsgs.length)];
+                    }
+                    document.getElementById('result-msg').innerText = msg;
+                    btn.innerText = curLvl === 6 ? "Isi Data Akhir" : (curLvl === 5 ? "Masuki Uji Kompetensi" : "Lanjut Level Berikutnya");
+                    btn.onclick = () => {
+                        if(curLvl === 6) {
+                            document.getElementById('result-screen').classList.remove('visible');
+                            setTimeout(() => document.getElementById('form-screen').classList.add('visible'), 500);
+                        } else {
+                            curLvl++; curQ = 0; lvlScore = 0;
+                            document.getElementById('result-screen').classList.remove('visible');
+                            startGame();
+                        }
+                    };
+                } else {
+                    document.getElementById('result-msg').innerText = "Jangan menyerah! Setiap kegagalan adalah langkah menuju keahlian. Pelajari kembali materi dan coba lagi untuk meraih standar profesional.";
+                    btn.innerText = "Ulangi Level";
+                    btn.onclick = () => {
+                        curQ = 0; lvlScore = 0;
+                        document.getElementById('result-screen').classList.remove('visible');
+                        startGame();
+                    };
+                }
+            }, 500);
+        }
+
+        function submitFinal() {
+            const n = document.getElementById('user-name').value;
+            const c = document.getElementById('user-class').value;
+            const s = document.getElementById('user-school').value;
+            if(!n || !c || !s) return alert("Isi semua data!");
+            
+            document.getElementById('form-screen').classList.remove('visible');
+            setTimeout(() => {
+                document.getElementById('result-screen').classList.add('visible');
+                document.getElementById('result-title').innerText = "Hasil Akhir";
+                document.getElementById('result-msg').innerHTML = `Nama: ${n}<br>Kelas: ${c}<br>Sekolah: ${s}<br><br><span style="color:var(--neon-cyan); font-size:1.5rem;">REPUTASI HANDAL</span>`;
+                document.getElementById('result-action-btn').innerText = "Selesai";
+                document.getElementById('result-action-btn').onclick = () => location.reload();
+            }, 500);
+        }
+
+        window.addEventListener('load', () => {
+            updatePath();
+            setTimeout(() => {
+                document.getElementById('loader').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('loader').style.display = 'none';
+                    document.getElementById('main-content').classList.add('visible');
+                }, 800);
+            }, 2000);
+        });
+    </script>
+</body>
+</html>

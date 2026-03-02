@@ -1,0 +1,130 @@
+{
+  "levels": [
+    {
+      "id": 1,
+      "title": "Penerimaan Kendaraan",
+      "description": "Pelanggan datang dengan mobil Avanza. Apa langkah pertama sesuai SOP?",
+      "questions": [
+        {
+          "id": 1,
+          "text": "Apa yang harus dilakukan Service Advisor saat pertama kali menyapa pelanggan?",
+          "options": [
+            "Langsung buka kap mesin",
+            "Memberi salam, senyum, dan menanyakan keperluan",
+            "Menanyakan STNK",
+            "Menyuruh pelanggan menunggu di ruang tunggu"
+          ],
+          "correct": 1,
+          "explanation": "SOP awal adalah 3S (Salam, Senyum, Sapa) untuk membangun kepercayaan."
+        },
+        {
+          "id": 2,
+          "text": "Dokumen apa yang harus dibuat untuk mencatat keluhan dan data kendaraan?",
+          "options": [
+            "Kwitansi",
+            "Kartu Stok",
+            "Work Order (Perintah Kerja)",
+            "Laporan Bulanan"
+          ],
+          "correct": 2,
+          "explanation": "Work Order (WO) adalah dokumen dasar untuk memulai proses servis."
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Identifikasi Keluhan",
+      "description": "Pelanggan mengeluh: 'Ada bunyi mencit (cit-cit) saat mengerem'.",
+      "questions": [
+        {
+          "id": 3,
+          "text": "Komponen apa yang paling mungkin menjadi penyebab bunyi tersebut?",
+          "options": [
+            "Filter Udara kotor",
+            "Kampas rem (brake pad) tipis atau kotor",
+            "Ban kurang angin",
+            "Air radiator habis"
+          ],
+          "correct": 1,
+          "explanation": "Bunyi mendecit saat pengereman biasanya indikasi kampas rem aus atau kotor."
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Manajemen Antrian",
+      "description": "Ada 3 mobil di bengkel. Atur prioritasnya!",
+      "questions": [
+        {
+          "id": 4,
+          "text": "Mobil A: Ganti oli (30 menit). Mobil B: Turun mesin (2 hari). Mobil C: Ganti bohlam (10 menit). Mana yang harus diselesaikan teknisi 'Quick Service'?",
+          "options": [
+            "Mobil B",
+            "Mobil A dan C",
+            "Hanya Mobil A",
+            "Semua mobil"
+          ],
+          "correct": 1,
+          "explanation": "Pekerjaan ringan (Fast Track) didahulukan untuk menjaga perputaran (stall turnover)."
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Estimasi Biaya & Sparepart",
+      "description": "Hitung total biaya servis berkala 10.000 KM.",
+      "questions": [
+        {
+          "id": 5,
+          "text": "Jasa Servis: Rp 150.000, Oli Mesin: Rp 350.000, Filter Oli: Rp 50.000. Berapa total estimasi yang harus dibayar pelanggan?",
+          "options": [
+            "Rp 500.000",
+            "Rp 550.000",
+            "Rp 450.000",
+            "Rp 600.000"
+          ],
+          "correct": 1,
+          "explanation": "150.000 + 350.000 + 50.000 = 550.000."
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Quality Control",
+      "description": "Servis selesai. Apa yang harus dicek sebelum mobil diserahkan?",
+      "questions": [
+        {
+          "id": 6,
+          "text": "Apa fungsi utama dari Quality Control (QC) oleh Foreman?",
+          "options": [
+            "Menagih uang ke pelanggan",
+            "Memastikan semua keluhan di WO sudah diperbaiki dengan benar",
+            "Mencuci mobil",
+            "Mengganti oli lagi"
+          ],
+          "correct": 1,
+          "explanation": "QC memastikan kualitas kerja teknisi sesuai standar sebelum unit dikirim."
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Kepuasan Pelanggan",
+      "description": "Pelanggan komplain karena setir mobilnya kotor terkena bekas oli.",
+      "questions": [
+        {
+          "id": 7,
+          "text": "Bagaimana sikap Service Advisor yang benar menghadapi komplain ini?",
+          "options": [
+            "Menyalahkan teknisi di depan pelanggan",
+            "Meminta maaf, segera membersihkan, dan memberikan kompensasi jika perlu",
+            "Mengabaikan karena servis mesin sudah bagus",
+            "Menyuruh pelanggan membersihkan sendiri"
+          ],
+          "correct": 1,
+          "explanation": "Empati dan solusi cepat adalah kunci menangani keluhan pelanggan."
+        }
+      ]
+    }
+  ]
+}
