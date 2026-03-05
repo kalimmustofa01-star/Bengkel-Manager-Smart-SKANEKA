@@ -97,7 +97,7 @@ export default function App() {
     <div className="flex flex-col items-center justify-center min-h-[80vh] text-center space-y-8 animate-slide">
       <div className="mb-2 border-b border-zinc-200 pb-4 w-full max-w-lg">
         <h2 className="text-3xl font-black tracking-[0.2em] text-zinc-800">GASPOL 4.0</h2>
-        <p className="text-[9px] uppercase tracking-widest text-zinc-500 font-bold">Gerakan Akselerasi Smart Problem-Oriented Learning Otomotif 4.0</p>
+        <p className="text-[9px] uppercase tracking-widest text-zinc-500 font-bold">Game Automotive Smart Problem-Oriented Learning 4.0</p>
       </div>
       <div className="ascii-box max-w-lg w-full">
         <pre className="text-[10px] leading-none mb-4 text-zinc-600 overflow-x-auto">
